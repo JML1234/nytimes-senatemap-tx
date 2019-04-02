@@ -1,0 +1,81 @@
+<!--
+This document contains the code for final
+code in part 2 of tutorial.
+ -->
+
+<html>
+<head>
+  <title> Nytimes TX Senate Race
+  </title>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <style>
+    .countylines {
+      <!-- stroke-width: 1px; -->
+      stroke: black;
+      <!-- fill: black; -->
+    }
+
+  </style>
+</head>
+<body>
+  <svg id = "screen"/>
+
+  <script>
+    // svg for map
+    let frame = d3.select('#screen')
+
+    // attributes svg, margins for the map
+    // make margin have room for legend, zoom buttons
+    let svg = {width: 400, height: 400}
+    let margin = {top:0,bottom:0,left:0,right:0}
+
+    frame.attr("width", svg.width -margin.left-margin.right)
+         .attr("height", svg.height -margin.top -margin.bottom)
+         .append("g")
+         .attr("class", "map")
+
+    // use promise statement so can work with data outside this file
+    // but inside the directory
+
+    // map of all us counties geojson
+    const us_countymap = d3.json('../USMap_counties.json')
+    const senate_results = d3.csv('../Texas_SenateCountyRaces.csv')
+    Promise.all([us_countymap]).then(function(data) {
+      // featurecollection of all us counties
+      const map_json = data[0];
+      // create array of all feature objects
+      const mapUS = map_json.features
+      // change map_json so ONLY texas counties part of map
+      // Texas's STATEFP = 48
+      const mapTX = mapUS.filter(d => d.properties.STATEFP == '48')
+      map_json.features = mapTX;
+      // define projection, and path
+      console.log(data[0])
+      let projectionTX = d3.geoAlbers()
+                           .rotate([100,0])
+                           .fitExtent([[0,0],[200, 200]], data[0])
+                        //  .rotate([0,0])
+                        //  .scale(2000)
+      let pathTX = d3.geoPath().projection(projectionTX)
+      // show map of texas
+      d3.select(".map").selectAll('path')
+           .data(mapTX)
+           .enter()
+           .append('path')
+           .attr('class', 'countylines')
+           .attr('d', function(d,i){
+             //console.log(i, pathTX(d))
+             return pathTX(d)
+           })
+
+      })
+      // end of then function
+
+
+
+  </script>
+</body>
+
+</html>

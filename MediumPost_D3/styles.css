@@ -1,0 +1,83 @@
+/*
+
+Stylesheet for code
+
+
+ */
+
+
+
+ #screen {
+   border: 1px solid blue;
+ }
+
+ circle {
+   pointer-events: none;
+ }
+
+
+/*  Parts one and two */
+.countylines {
+  stroke-width: .2px;
+  stroke: white;
+}
+.topoCountyLine {
+  fill: none;
+  stroke: black;
+  pointer-events: none;
+}
+
+
+
+/*  Part three */
+
+.lightText{
+  font-size: 9;
+}
+
+.darkText{
+  font-size: 9;
+}
+
+#table1 {
+  /* NEED seperate before the spacing */
+
+}
+
+tr.bordered {
+    border-bottom: 1px solid #000000;
+}
+
+table{
+    border-collapse: collapse;
+}
+.firstLine td{
+    border-bottom: 2px solid black;
+}
+
+td .positionCenter{
+  align: "center";
+}
+
+td .positionLeft{
+  align: "left";
+}
+
+#tooltip {
+  position: absolute;
+  width: 65;
+  height: 40;
+  padding: 10px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#tooltip p {
+  margin: 0;
+  font-family: Futura;
+  font-size: 16px;
+  line-height: 20px;
+}

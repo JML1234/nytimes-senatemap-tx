@@ -1,0 +1,64 @@
+<!--
+This document contains a completed version of the new
+york times senate map on Beto O'Rourke vs Ted Cruz.
+
+On MAC: use terminal to reach the document folder.
+Then, type in XXX for python3 -m http.server, YYYY for python2
+ -->
+
+<html>
+<head>
+  <title> Nytimes TX Senate Race</title>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+
+<body>
+
+  <!-- Body for the tooltip.
+       COVERED IN PART 3 OF THE TUTORIAL. -->
+
+  <!-- Three css parts to the tooltip (not including the title):
+      1) littleRect
+      2) lightText
+      3) darkText -->
+  <div id="tooltip">
+    <table id = "table1">
+      <tr > <strong id = "title"> </strong></tr>
+
+      <tr class="firstLine" >
+        <td style="margin-left: 0px;" class="lightText">Candidate</td>
+        <td class="lightText" align="center">Party</td>
+        <td class="lightText" align="center">Votes</td>
+        <td class="lightText" align="center">Pct.</td>
+      </tr>
+      <tr>
+        <td class="darkText"><img src='../Data/CruzColor.png' id = 'rect' width="4" height= "4"/>Ted Cruz</td>
+        <td class="lightText" align="center">Rep.</td>
+        <td class="lightText" align="center">VotesRep</td>
+        <td class="lightText" align="center"><strong>PctRep</strong></td>
+      </tr>
+      <tr>
+        <td class="darkText" align="left"><img src='../Data/CruzColor.png' id = 'rect' width="4" height= "4">Beto O'Rourke</td>
+        <td class="lightText" align="center">Dem.</td>
+        <td class="lightText" align="center">VotesDem</td>
+        <td class="lightText" align="center"><strong>PctDem</strong></td>
+      </tr>
+      <tr>
+        <td class="lightText">*Incumbent</td>
+      </tr>
+    </table>
+  </div>
+
+
+
+  <svg id = "screen" align = "center"/>
+  <script src="../javascript/colorfunction.js"></script>
+  <script src="../javascript/mainCode.js"></script>
+
+</body>
+
+</html>
