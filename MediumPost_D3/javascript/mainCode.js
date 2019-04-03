@@ -9,7 +9,7 @@
 let frame = d3.select('#screen')
 // attributes svg, margins, mapframe for the map
 // make margin have room for legend, zoom buttons
-let svg = {width: 350, height: 350}
+let svg = {width: 450, height: 450}
 let margin = {top:25,bottom:25,left:25,right:25}
 let mapframe = {width: (svg.width -margin.left-margin.right),
                 height: (svg.height -margin.top -margin.bottom) }
@@ -45,6 +45,7 @@ const whenDataUploadsRunThisFunction = async() => {
   // featurecollection of all us counties
   const mapUSJSON = await d3.json('../Data/USMap_counties.json')
   const countyData = await d3.csv('../Data/TexasSenateRace_ByCounty.csv')
+  let topoUS = await d3.json('../Data/USMap_CountiesTopo.json')
 
   // create array of all feature objects
   const mapUS = mapUSJSON.features;
@@ -68,7 +69,27 @@ const whenDataUploadsRunThisFunction = async() => {
   //------------------------
 
   // part 1) create Texas map
-  let map = d3.select("#map")
+
+  // first part is so we can fill in different colors for step 2
+  // second part is so we can create good borders
+
+
+   var txCountyBorders = topojson.mesh(topoUS, topoUS.objects.USMap_Counties, function(county1, county2){
+
+     var checkCountyInTexas =  county1.properties.STATEFP == 48 || county2.properties.STATEFP == 48;
+     return checkCountyInTexas;
+
+   })
+   let map = d3.select("#map")
+
+
+  // --------------------
+
+  // mesh needed to be after building the lines for the state
+
+  // part 2) add color for each state
+
+  // first part - fill with different colors
   map.selectAll('path')
       .data(mapTX.features) // mapTX.features is an array of GeoJSON objects
       .enter()
@@ -78,15 +99,17 @@ const whenDataUploadsRunThisFunction = async() => {
               // give unique id to each county
       .attr('d', d => pathTX(d))
 
-  // --------------------
+  map.append('path')
+     .attr('id', 'outline')
+     .datum(txCountyBorders)
+     .attr('d', d => pathTX(d))
 
-
-  // part 2) add color for each state
    d3.selectAll(".countylines")
      .attr('fill', function(d){ // creating the color for the county
          return color(d)
        })
      .attr('opacity', .9)
+
 
 
   // --------------------
@@ -97,8 +120,11 @@ const whenDataUploadsRunThisFunction = async() => {
 
 
   // create the borders that will appear when the mouse is scrolling over (helper for step 1)
-  let topoUS = await d3.json('../Data/USMap_CountiesTopo.json')
-  var topoTX = topoUS.objects.USMap_Counties.geometries.filter(d => d.properties.STATEFP == '48')
+
+  // let topoUS = await d3.json('../Data/USMap_CountiesTopo.json')
+  // var topoTX = topoUS.objects.USMap_Counties.geometries.filter(d => d.properties.STATEFP == '48')
+
+  // moved this code up to the top to redraw the borders
   let county_border = map.append("path")
 
   // create dict with keys as the county name, values as data for the county (helper for step 2)
@@ -109,14 +135,9 @@ const whenDataUploadsRunThisFunction = async() => {
     var rourkeData = {"votes": Number(d.DEM.replace(/[,]/g,"")),"pct": Number(d.Rourke)};
 
     dataDict[countyName] = {"cruzData": cruzData, "rourkeData": rourkeData}
+
   })
 
-  // tooltip step 2
-  d3.select('table1')
-    .append('text')
-    .text("dssdsdsdsds")
-    .attr("x",20)
-    .attr("y",20)
 
   // enable counties to change when mouse is over it
   d3.selectAll(".countylines").on("mousemove", mouseOnPlot);
@@ -127,11 +148,13 @@ const whenDataUploadsRunThisFunction = async() => {
     // NEED & between for id because id does not take spaces
     var county_name = this.id;
     var interiors = topojson.mesh(topoUS, topoUS.objects.USMap_Counties, function(county1, county2){
+
       var checkCountyInTexas =  county1.properties.STATEFP == 48 || county2.properties.STATEFP == 48;
       var county1_name = county1.properties.NAME.replace(/[ ]/g,"&")
       var county2_name = county2.properties.NAME.replace(/[ ]/g,"&")
       var checkCountyName = (county1_name == county_name || county2_name == county_name);
       return checkCountyInTexas && checkCountyName;
+
     })
 
 
@@ -141,10 +164,8 @@ const whenDataUploadsRunThisFunction = async() => {
                  .attr("d", pathTX) // same as d => pathTX(d)
 
 
-    // step 2: table appears near the browser's mouse
-
-    d3.select('#title')
-      .text(this.id.replace(/[&]/g," ") + " County")
+    // step 2: create the tooltip
+    // table appears near the browser's mouse
 
 
     var xPosition = event.pageX;
@@ -158,6 +179,61 @@ const whenDataUploadsRunThisFunction = async() => {
            .style("width", 2*mapframe.width/3)
            .style("height", 2*mapframe.height/5)
            .style("visibility", "visible")
+
+
+    // fill in elements based off values for county name
+    // eight terms: wColor, lColor, wName, lName, wVote, lVote, wPer, lPer
+    // src='../Data/CruzColor.png'
+
+    countyName = this.id.toUpperCase();
+
+    let dataForCounty = dataDict[countyName];
+    let cruzData = dataForCounty['cruzData']; let rourkeData = dataForCounty['rourkeData'];
+
+    // k is true if Cruz won county,
+    //   is false otherwise
+    let k = (cruzData['votes'] > rourkeData['votes']);
+
+    // create formatting you want
+    // GREAT GUIDE https://www.displayr.com/how-to-format-numbers-dates-and-time-using-in-d3-htmlwidgets-in-r/
+    var numVotesForCruz = d3.format(',~r')(cruzData['votes']);
+    var numVotesForRourke = d3.format(',~r')(rourkeData['votes']);
+    var cruzPer = d3.format('.1f')(cruzData.pct) + '%'
+    var rourkePer = d3.format('.1f')(rourkeData.pct) + '%'
+
+    d3.select('#title')
+      .text(this.id.replace(/[&]/g," ") + " County")
+
+    d3.select('#wColor')
+      .attr('src',  k?('../Data/CruzColor.png'):('../Data/BetoColor.png'))
+
+    d3.select('#lColor')
+      .attr('src',  k?('../Data/BetoColor.png'):('../Data/CruzColor.png'))
+
+    d3.select('#wName')
+      .text(k?('Ted Cruz'):("Beto O'Rourke"))
+
+    d3.select('#lName')
+      .text(k?("Beto O'Rourke"):("Ted Cruz"))
+
+    d3.select('#wParty')
+      .text(k?('Rep.'):("Dem."))
+
+    d3.select('#lParty')
+      .text(k?("Dem."):("Rep."))
+
+    d3.select('#wVotes')
+      .text(k?numVotesForCruz:numVotesForRourke)
+
+    d3.select('#lVotes')
+      .text(k?numVotesForRourke:numVotesForCruz)
+
+    d3.select('#wPer')
+      .text(k?cruzPer:rourkePer)
+
+    d3.select('#lPer')
+      .text(k?rourkePer:cruzPer)
+
 
   }
   // end mouseOnPlot function
@@ -210,7 +286,7 @@ const whenDataUploadsRunThisFunction = async() => {
            .attr('text-anchor', 'middle')
            .attr('alignment-baseline', 'baseline')
            .attr('font-weight','bold')
-           .attr('font-size', 8)
+           .attr('font-size', 8*mapframe.width/290 )
            .attr('id', city_name.replace(/[ ]/g,"") + "Text")
            .attr("pointer-events","none")
            .text(city_name)

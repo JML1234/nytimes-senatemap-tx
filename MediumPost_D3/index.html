@@ -27,25 +27,25 @@ Then, type in XXX for python3 -m http.server, YYYY for python2
       3) darkText -->
   <div id="tooltip">
     <table id = "table1">
-      <tr > <strong id = "title"> </strong></tr>
+      <tr> <strong id = "title"> </strong></tr>
 
-      <tr class="firstLine" >
-        <td style="margin-left: 0px;" class="lightText">Candidate</td>
+      <tr class="line">
+        <td class="lightText">Candidate</td>
         <td class="lightText" align="center">Party</td>
         <td class="lightText" align="center">Votes</td>
         <td class="lightText" align="center">Pct.</td>
       </tr>
-      <tr>
-        <td class="darkText"><img src='../Data/CruzColor.png' id = 'rect' width="4" height= "4"/>Ted Cruz</td>
-        <td class="lightText" align="center">Rep.</td>
-        <td class="lightText" align="center">VotesRep</td>
-        <td class="lightText" align="center"><strong>PctRep</strong></td>
+      <tr class="Line">
+        <td class="darkText"><img id = "wColor" id = 'rect' width="4" height= "4"/><span id = "wName"></span></td>
+        <td class="lightText" id = 'wParty' align="center">Party of victor</td>
+        <td class="lightText" id = "wVotes" align="center">Votes for ct winner</td>
+        <td class="lightText" id = 'wPer' align="center"><strong>Per </strong></td>
       </tr>
-      <tr>
-        <td class="darkText" align="left"><img src='../Data/CruzColor.png' id = 'rect' width="4" height= "4">Beto O'Rourke</td>
-        <td class="lightText" align="center">Dem.</td>
-        <td class="lightText" align="center">VotesDem</td>
-        <td class="lightText" align="center"><strong>PctDem</strong></td>
+      <tr class="Line">
+        <td class="darkText"><img id = "lColor"  id = 'rect' width="4" height= "4"><span id = "lName"></span></td>
+        <td class="lightText" id = 'lParty' align="center">Party for loser</td>
+        <td class="lightText" id = "lVotes" align="center">Votes for ct loser</td>
+        <td class="lightText" id = "lPer" align="center"><strong>PctDem</strong></td>
       </tr>
       <tr>
         <td class="lightText">*Incumbent</td>

@@ -18,7 +18,7 @@ Stylesheet for code
 
 /*  Parts one and two */
 .countylines {
-  stroke-width: .2px;
+  stroke-width: 0px;
   stroke: white;
 }
 .topoCountyLine {
@@ -26,33 +26,45 @@ Stylesheet for code
   stroke: black;
   pointer-events: none;
 }
-
+#outline {
+  stroke-width: 0.7px;
+  opacity: 0.7;
+  stroke: white;
+  fill: none;
+  pointer-events: none;
+}
 
 
 /*  Part three */
 
 .lightText{
   font-size: 9;
+  color: #595959;
 }
 
 .darkText{
   font-size: 9;
 }
 
-#table1 {
-  /* NEED seperate before the spacing */
-
+table {
+  width: 100;
 }
 
 tr.bordered {
     border-bottom: 1px solid #000000;
 }
 
+td {
+  height: 5px;
+}
+
 table{
     border-collapse: collapse;
+    width: 200px;
 }
-.firstLine td{
-    border-bottom: 2px solid black;
+.Line td{
+    border-bottom: .2px solid black;
+    color: #595959;
 }
 
 td .positionCenter{
