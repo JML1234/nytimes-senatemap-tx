@@ -29,23 +29,23 @@ Then, type in XXX for python3 -m http.server, YYYY for python2
     <table id = "table1">
       <tr> <strong id = "title"> </strong></tr>
 
-      <tr class="line">
+      <tr class="Line">
         <td class="lightText">Candidate</td>
         <td class="lightText" align="center">Party</td>
         <td class="lightText" align="center">Votes</td>
         <td class="lightText" align="center">Pct.</td>
       </tr>
       <tr class="Line">
-        <td class="darkText"><img id = "wColor" id = 'rect' width="4" height= "4"/><span id = "wName"></span></td>
+        <td class="darkText"><img id = "wColor" id = 'rect' width="4" height= "4"/><span id = "wName" ></span></td>
         <td class="lightText" id = 'wParty' align="center">Party of victor</td>
-        <td class="lightText" id = "wVotes" align="center">Votes for ct winner</td>
-        <td class="lightText" id = 'wPer' align="center"><strong>Per </strong></td>
+        <td class="darkText" id = "wVotes" align="center">Votes for ct winner</td>
+        <td class="boldText" id = 'wPer' align="center">Per </td>
       </tr>
       <tr class="Line">
-        <td class="darkText"><img id = "lColor"  id = 'rect' width="4" height= "4"><span id = "lName"></span></td>
+        <td  class="darkText"><img id = "lColor"  id = 'rect' width="4" height= "4"><span id = "lName"></span></td>
         <td class="lightText" id = 'lParty' align="center">Party for loser</td>
-        <td class="lightText" id = "lVotes" align="center">Votes for ct loser</td>
-        <td class="lightText" id = "lPer" align="center"><strong>PctDem</strong></td>
+        <td class="darkText" id = "lVotes" align="center">Votes for ct loser</td>
+        <td class="boldText" id = "lPer" align="center">PctDem</td>
       </tr>
       <tr>
         <td class="lightText">*Incumbent</td>
@@ -55,7 +55,7 @@ Then, type in XXX for python3 -m http.server, YYYY for python2
 
 
 
-  <svg id = "screen" align = "center"/>
+  <svg id = "screen"/>
   <script src="../javascript/colorfunction.js"></script>
   <script src="../javascript/mainCode.js"></script>
 

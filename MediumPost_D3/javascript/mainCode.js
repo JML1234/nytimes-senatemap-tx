@@ -9,8 +9,8 @@
 let frame = d3.select('#screen')
 // attributes svg, margins, mapframe for the map
 // make margin have room for legend, zoom buttons
-let svg = {width: 450, height: 450}
-let margin = {top:25,bottom:25,left:25,right:25}
+let svg = {width: 400, height: 350}
+let margin = {top:5,bottom:25,left:50,right:50}
 let mapframe = {width: (svg.width -margin.left-margin.right),
                 height: (svg.height -margin.top -margin.bottom) }
 
@@ -19,8 +19,13 @@ frame.attr("width", svg.width)
      .append("g")
      .attr("transform", "translate("+margin.left+", "+margin.top+")")
      .attr("id", "map")
-  //   .attr("class", "screen")
 
+frame.append("g")
+     .attr('id', 'background')
+
+// there are two g windows just defined.
+// map window for the map
+// background window for the buttons and legend
 //---------------------------------------
 
 
@@ -47,12 +52,19 @@ const whenDataUploadsRunThisFunction = async() => {
   const countyData = await d3.csv('../Data/TexasSenateRace_ByCounty.csv')
   let topoUS = await d3.json('../Data/USMap_CountiesTopo.json')
 
+  //console.log(topoUS)
+  let testUS = topojson.feature(topoUS, topoUS.objects.USMap_Counties)
+  console.log("etst",testUS)
+
+
+
   // create array of all feature objects
-  const mapUS = mapUSJSON.features;
+  const mapUS = testUS.features//mapUSJSON.features; console.log(mapUSJSON)
   // change map_json so ONLY texas counties part of map
   // Texas's STATEFP = 48
   mapUSJSON.features = mapUS.filter(d => d.properties.STATEFP == '48')
   let mapTX = mapUSJSON;
+
   // define projection, and path
   let projectionTX = d3.geoAlbers()
                        .rotate([100.1,0])
@@ -98,17 +110,20 @@ const whenDataUploadsRunThisFunction = async() => {
       .attr('id', d => d.properties.NAME.replace(/[ ]/g,"&"))
               // give unique id to each county
       .attr('d', d => pathTX(d))
+    //  .attr('class', 'zoom')
 
   map.append('path')
      .attr('id', 'outline')
      .datum(txCountyBorders)
      .attr('d', d => pathTX(d))
+  //   .attr('class', 'zoom')
 
    d3.selectAll(".countylines")
      .attr('fill', function(d){ // creating the color for the county
          return color(d)
        })
      .attr('opacity', .9)
+  //   .attr('class', 'zoom')
 
 
 
@@ -176,8 +191,8 @@ const whenDataUploadsRunThisFunction = async() => {
 
     tooltip.style("left", Number(xPosition) - tooltip_Width/2)
            .style("top", Number(yPosition) + 25)
-           .style("width", 2*mapframe.width/3)
-           .style("height", 2*mapframe.height/5)
+           .style("width", 2*mapframe.width/3 - 20)
+           .style("height", mapframe.height/3 - 20)
            .style("visibility", "visible")
 
 
@@ -249,12 +264,222 @@ const whenDataUploadsRunThisFunction = async() => {
 
   }
 
-  // Step two: make path bold
+  // Part Four: Add three circles: zoom in, zoom out, and complete zoom out
+
+  // For these buttons and legend, will use the following
+  let background  =  d3.select('#background')
+
+  // let 'zoom in' be c1, 'zoom out' be c2, 'complete zoom out' be c3
+  // create radius, center for the zoom in circle
+  // Calculations required to get everything in proportion
+
+  // for big circle
+  let radiusZoom = (margin.right - 10)/3
+  let cxZoom = mapframe.width + margin.right/2 + margin.left
+  let cyZoom = margin.top + radiusZoom + 4
+
+  // for small circle
+  var radiusInnerCircle = 2.5*radiusZoom/6 // for magnifying glass
+  var lineLength = Number(d3.format('.1f')(radiusInnerCircle)) - 3
+
+  // colors
+  var lightColor = '#DCDCDC';
+  var darkColor =  '#B0B0B0';
+
+  // zoom in circle - construction
+
+
+   // make zoom in circle
+   background.append('circle')
+             .attr('r', radiusZoom) // 20 radius dope size visually
+             .attr('cx', cxZoom)
+             .attr('cy', cyZoom)
+             .attr('fill', darkColor)//'#F0F0F0') lighter grey
+             .attr('id', 'c1') // call c1 circle
+
+   // magnifying glass circle, c1 circle
+   background.append('circle')
+             .attr('r', radiusInnerCircle) // 20 radius dope size visually
+             .attr('cx', cxZoom - radiusZoom/12)
+             .attr('cy',cyZoom - radiusZoom/12)
+             .attr('fill', 'none')
+             .attr('stroke', 'white')
+             .attr('id', 'c1InnerCircle')
+             .attr('pointer-events', 'none')
+
+    var cxInnerC1 = Number(d3.select('#c1InnerCircle').attr('cx'))
+    var cyInnerC1 = Number(d3.select('#c1InnerCircle').attr('cy'))
+
+    // first horizontal line
+    background.append('line')
+              .attr('x1', cxInnerC1 - lineLength)
+              .attr('x2', cxInnerC1 + lineLength)
+              .attr('y1', cyInnerC1)
+              .attr('y2', cyInnerC1)
+              .attr('stroke', 'white')
+
+    // first vertical line
+    background.append('line')
+              .attr('x1', cxInnerC1)
+              .attr('x2', cxInnerC1)
+              .attr('y1', cyInnerC1 - lineLength)
+              .attr('y2', cyInnerC1 + lineLength)
+              .attr('stroke', 'white')
+
+    // first handle, line by -45˚ from center
+    var xHandle = cxInnerC1 + Math.cos(-45*Math.PI / 180)*radiusInnerCircle
+    var yHandle = cyInnerC1 + Math.sin(45*Math.PI / 180)*radiusInnerCircle
+
+    background.append('line')
+              .attr('x1', xHandle)
+              .attr('x2', xHandle + 1.7*lineLength)
+              .attr('y1', yHandle)
+              .attr('y2', yHandle + 1.7*lineLength)
+              .attr('stroke', 'white')
+
+
+
+    // zoom out circle - construction
 
 
 
 
+    cyZoom = cyZoom + 2*radiusZoom + 4
 
+    // make zoom in circle
+    background.append('circle')
+              .attr('r', radiusZoom) // 20 radius dope size visually
+              .attr('cx', cxZoom)
+              .attr('cy',cyZoom)
+              .attr('fill', lightColor)//'#F0F0F0') lighter grey
+              .attr('id', 'c2') // call c2 circle
+
+
+    // magnifying glass circle, c2 circle
+    background.append('circle')
+              .attr('r', radiusInnerCircle) // 20 radius dope size visually
+              .attr('cx', cxZoom - radiusZoom/12)
+              .attr('cy',cyZoom - radiusZoom/12)
+              .attr('fill', 'none')
+              .attr('stroke', 'white')
+              .attr('id', 'c2InnerCircle')
+              .attr('pointer-events', 'none')
+
+     var cxInnerC2 = Number(d3.select('#c2InnerCircle').attr('cx'))
+     var cyInnerC2 = Number(d3.select('#c2InnerCircle').attr('cy'))
+
+     // second horizontal line
+     background.append('line')
+               .attr('x1', cxInnerC2 - lineLength)
+               .attr('x2', cxInnerC2 + lineLength)
+               .attr('y1', cyInnerC2)
+               .attr('y2', cyInnerC2)
+               .attr('stroke', 'white')
+
+     // first handle, line by -45˚ from center
+     xHandle = cxInnerC2 + Math.cos(-45*Math.PI / 180)*radiusInnerCircle
+     yHandle = cyInnerC2 + Math.sin(45*Math.PI / 180)*radiusInnerCircle
+
+     background.append('line')
+               .attr('x1', xHandle)
+               .attr('x2', xHandle + 1.7*lineLength)
+               .attr('y1', yHandle)
+               .attr('y2', yHandle + 1.7*lineLength)
+                .attr('stroke', 'white')
+
+
+
+
+      // zoom out completely circle - construction
+
+
+
+
+      cyZoom = cyZoom + 2*radiusZoom + 4
+
+      // make completely zoom out circle
+      background.append('circle')
+                .attr('r', radiusZoom) // 20 radius dope size visually
+                .attr('cx', cxZoom)
+                .attr('cy', cyZoom)
+                .attr('fill', lightColor)//'#F0F0F0') lighter grey
+                .attr('id', 'c3') // call c3 circle
+
+       // creating the X
+
+       background.append('line')
+                 .attr('x1', cxZoom - 2*lineLength)
+                 .attr('x2', cxZoom + 2*lineLength)
+                 .attr('y1', cyZoom - 2*lineLength)
+                 .attr('y2', cyZoom + 2*lineLength)
+                 .attr('stroke', 'white')
+
+      background.append('line')
+                .attr('x1', cxZoom + 2*lineLength)
+                .attr('x2', cxZoom - 2*lineLength)
+                .attr('y1', cyZoom - 2*lineLength)
+                .attr('y2', cyZoom + 2*lineLength)
+                .attr('stroke', 'white')
+
+   // end of constructing the three circles
+   // --------------------
+
+
+
+    // part 5: add interactivity to the circle, zooming and drag
+
+
+
+    // create names for buttons
+    // create names for buttons
+    let zoomIn = d3.select('#c1')
+    let zoomOut = d3.select('#c2')
+    let zoomComOut = d3.select('#c3')
+
+    // defining the zoom
+    var zoom = d3.zoom().on("zoom", zoomed)
+
+    function zoomed(){
+      map.attr('transform', d3.event.transform)
+      console.log(d3.event.transform)
+    }
+
+    // set initial transform
+    //var t = d3.zoomIdentity.translate(50,5).scale(1)
+    map.call(zoom)
+
+    // so can't zoom without clicking the buttons
+    // map.on(".zoom", null);
+
+    // // when click active ifCondition function
+    // zoomIn.on('click', ifCondition)
+    // map.on('click', display)
+    // function display() {
+    //   console.log(d3.mouse(this)[0], d3.mouse(this)[1])
+    // }
+    // let i = 1;
+    // function ifCondition() {
+    //   i += 1
+    //   t = d3.zoomIdentity.translate(50 - i*100,5 - i*100).scale(i*1);
+    //   map.transition()
+    //      .duration(600)
+    //      .call(zoom.transform, t)
+    //   console.log('attr', map.attr("transform"))
+    //   console.log('t', t)
+    // }
+
+
+
+
+    // let drag = d3.drag().on('start', started);
+    // function started() {
+    //     map.attr('transform', d3.event.transform)
+    //     console.log(d3.mouse(this[0]), d3.mouse(this[1]))
+    // }
+    // map.call(drag)
+
+
+    // end of creating interactivty for circles
     // --------------------
 
     // Part 7) add city labels and include a dot for its location

@@ -11,11 +11,6 @@ Stylesheet for code
    border: 1px solid blue;
  }
 
- circle {
-   pointer-events: none;
- }
-
-
 /*  Parts one and two */
 .countylines {
   stroke-width: 0px;
@@ -39,40 +34,34 @@ Stylesheet for code
 
 .lightText{
   font-size: 9;
+  color : #ff0000;
   color: #595959;
 }
 
 .darkText{
   font-size: 9;
+  color: #000000;
 }
 
-table {
-  width: 100;
-}
-
-tr.bordered {
-    border-bottom: 1px solid #000000;
-}
-
-td {
-  height: 5px;
+.boldText{
+  font-size: 9;
+  color: #121230;
+  font-weight: bold;
 }
 
 table{
     border-collapse: collapse;
-    width: 200px;
+    width: 180px;
+    height: 60px;
+    padding-top: 200px;
 }
 .Line td{
     border-bottom: .2px solid black;
-    color: #595959;
 }
 
-td .positionCenter{
-  align: "center";
-}
-
-td .positionLeft{
-  align: "left";
+line {
+  stroke-width: 1;
+  pointer-events: none;
 }
 
 #tooltip {
@@ -85,11 +74,4 @@ td .positionLeft{
   box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   visibility: hidden;
-}
-
-#tooltip p {
-  margin: 0;
-  font-family: Futura;
-  font-size: 16px;
-  line-height: 20px;
 }
